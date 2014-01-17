@@ -12,7 +12,7 @@ class ComponentTestCase(BaseComponentTestCase):
         "file": os.path.realpath(os.path.join(os.path.dirname(__file__), '../%s.yml' % name))
     }]
 
-    def console_base(capability, console, remote):
+    def console_base(self, capability, console, remote):
         try:
             driver = webdriver.Remote(
                 command_executor=remote,
