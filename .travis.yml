@@ -12,6 +12,7 @@ env:
   - secure: "LqU2xFLn3wsmU2LXicdfn3MCB3v0Yf+pUQAnCAF1pAWLE+sBDCIa6taZwPxUN00W79pd4S7XvT2kq4CpzsdQPPZQ4wurzCvumdvmafr6Odde5pTFFdbrqHbBIn48P+vYNJUFnKL55b1d/E38XyfUMxeSm9B+VTKvBs3YtftKG7Y="
   - secure: "UrjfyXOx50rBKWt/afxCp/if+E4In53PGBilNslwTbU8HbgiGGCv1uvlaXAic02b+vunDerXZD+XYOxNvUdmD+RKVAKAi6BUk+XEnPKOuRg4EfCbrRgqpaTEWVYu9OdpE4jXAwxNNQuq78qvfwI7lq/Xg2CA5Olz2dNYPOOpXzI="
   - secure: "e6gc0dEE4Ehm3lYKzMv9AHNN6x6ou7jRv0gweMHXf17zJ4Iu7QOw+3bTCImsjrAt8046XD0Dv19FVT4ZBOZuU66HL+k0IMF9jh989WU3dQ41Dv5FrWKn1kt/heQ87H04L4bnhbI20ftOmy1GFCWZkB0TycgyXoQEt/X+6KLNd0k="
+  - secure: "NWaIx+Cn7BJMhv7TzEm0ckbTpVEqC4RrjdGhaw4AZkLw4Dy9XzlPOHCHfBLGFDe0pwFsNzOpNnbteD4lFc9bbiCbasbaNMDYtYiqtQnvtbm+WPiRVA2vvVkE+KC4IJUpixLnsRXn+dVpf9nc8KQyfTmTn6/9nPYQJlTxXrAQbnM="
 
 language: python
 python:
