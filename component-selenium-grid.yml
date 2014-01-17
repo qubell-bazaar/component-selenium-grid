@@ -29,8 +29,7 @@ application:
       interfaces:
         executor:
           execute-workflow: receive-command(object request => object status => object status)
-          #should be uncommented on Qubell 23 release
-          #execute-command: send-command(string interface, string command, map<string, object> arguments => map<string, object> response => map<string, object> response)
+          execute-command: send-command(string interface, string command, map<string, object> arguments => map<string, object> response => map<string, object> response)
 
     keystore:
       type: reference.Service
