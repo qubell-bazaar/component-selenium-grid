@@ -1,4 +1,5 @@
 simplejson
 pyaml
 requests
+selenium
 qubell-api-python-client
