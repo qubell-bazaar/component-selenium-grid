@@ -26,9 +26,9 @@ class ComponentTestCase(BaseComponentTestCase):
     @instance(byApplication=name)
     @values({"endpoints.console-url": "console", "endpoints.remote-url": "remote"})
     def test_chrome(self, instance, console, remote):
-        console_base(DesiredCapabilities.CHROME, console, remote)
+        self.console_base(DesiredCapabilities.CHROME, console, remote)
 
     @instance(byApplication=name)
     @values({"endpoints.console-url": "console", "endpoints.remote-url": "remote"})
     def test_chrome(self, instance, console, remote):
-        console_base(DesiredCapabilities.FIREFOX, console, remote)
+        self.console_base(DesiredCapabilities.FIREFOX, console, remote)
