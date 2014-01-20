@@ -21,7 +21,7 @@ application:
   configuration:
     conf.selenium-version: "2.37.0"
     conf.slave-node-count: "0"
-    conf.recipes: "https://raw.github.com/qubell/component-selenium-grid/master/selenium-grid-cookbook-v0.0.5.tar.gz"
+    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-some.tar.gz"
 
   components:
     genesis:
