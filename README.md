@@ -1,7 +1,7 @@
 ![Qubell](http://qubell.wpengine.com/wp-content/uploads/2013/05/Qubell-Logo-RGB-Sml.png) Selenium Grid 
 =============
 
-[![Build Status](https://travis-ci.org/dmakhno/component-selenium-grid.png?branch=master)](https://travis-ci.org/dmakhno/component-selenium-grid)
+[![Build Status](https://travis-ci.org/qubell-bazaar/component-selenium-grid.png?branch=master)](https://travis-ci.org/qubell-bazaar/component-selenium-grid)
 
 This is qubell component, that allows to create selenium-grid in few clicks.
 
@@ -29,7 +29,7 @@ Compoent is configured for quick launch with AWS EC2.
 > - 22 (SSH)
 > - 4444 (Selenium Hub)
 
-1. Grab component by "Get it now" from [here](http://rawgithub.com/qubell/component-selenium-grid/master/_resources/grid.html) to you prefered organization.
+1. Grab component by "Get it now" from [here](http://rawgithub.com/qubell-bazaar/component-selenium-grid/master/_resources/grid.html) to you prefered organization.
 2. Configure if `Environment`->`default` hasn't associated Cloud Account (create new via `Platform`->`Cloud Account`)
 3. Configure if `Environment`->`default` hasn't associated Secure Vault 2.0 and Workflow Service (create new via `Platform`->`Services`)
 4. Go to `Applications` and press `[Launch]`

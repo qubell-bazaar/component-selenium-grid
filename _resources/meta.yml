@@ -1,9 +1,9 @@
 kit:
   name: "Qubell Selenium Grid"
-  link: https://github.com/qubell/component-selenium-grid
+  link: https://github.com/qubell-bazaar/component-selenium-grid
   applications: 
     - name: "Selenium Grid"
-      manifest: "https://raw.github.com/qubell/component-selenium-grid/master/selenium-grid-manifest.yml"
+      manifest: "https://raw.github.com/qubell-bazaar/component-selenium-grid/master/selenium-grid-manifest.yml"
   provider:
     name: "Qubell"
     link: http://qubell.com

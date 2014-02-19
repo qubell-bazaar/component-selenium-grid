@@ -1,4 +1,9 @@
 application:
+  configuration:
+    conf.selenium-version: "2.39.0"
+    conf.slave-node-count: "0"
+    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/dmakhno/component-selenium-grid-cookbooks-stable-18f5070.tar.gz"
+
   interfaces:
     conf: 
       selenium-version: bind(selenium-grid#input.selenium-version)
@@ -17,11 +22,6 @@ application:
   bindings:
     - [genesis, selenium-grid]
     - [keystore, selenium-grid]
-
-  configuration:
-    conf.selenium-version: "2.39.0"
-    conf.slave-node-count: "0"
-    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/dmakhno/component-selenium-grid-cookbooks-stable-18f5070.tar.gz"
 
   components:
     genesis:
