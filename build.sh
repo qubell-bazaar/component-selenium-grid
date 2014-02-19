@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 REPO_NAME=$(echo ${TRAVIS_REPO_SLUG} | cut -d/ -f2)
 OWNER_NAME=$(echo ${TRAVIS_REPO_SLUG} | cut -d/ -f1)
 GIT_REVISION=$(git log --pretty=format:'%h' -n 1)
