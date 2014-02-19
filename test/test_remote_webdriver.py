@@ -5,7 +5,7 @@ from qubell.api.private.testing import instance, workflow, values
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-class ComponentTestCase(BaseComponentTestCase):
+class SeleniumGridComponentTestCase(BaseComponentTestCase):
     name = "component-selenium-grid"
     apps = [{
         "name": name,
