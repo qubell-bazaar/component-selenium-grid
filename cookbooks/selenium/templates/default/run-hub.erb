@@ -5,6 +5,7 @@ CONFIGPATH=<%= File.join(node['selenium']['server']['installpath'], 'hubConfig.j
 HUBJAVA=/usr/bin/java
 HUBARGS="-jar $SELPATH -role hub -hubConfig $CONFIGPATH "
 PIDFILE=/var/run/selenium/hub.pid
+mkdir -p /var/run/selenium
 case "$1" in
   start)
     echo -n "Starting grid hub"
