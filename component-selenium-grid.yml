@@ -1,6 +1,6 @@
 application:
   configuration:
-    conf.selenium-version: "2.39.0"
+    conf.selenium-version: "2.41.0"
     conf.slave-node-count: "0"
     conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-2638b82.tar.gz"
 
@@ -19,27 +19,8 @@ application:
       scale: bind(selenium-grid#actions.scale)
       re-start: bind(selenium-grid#actions.re-start)
 
-  bindings:
-    - [genesis, selenium-grid]
-    - [keystore, selenium-grid]
-
   components:
-    genesis:
-      type: reference.Service
-      interfaces:
-        executor:
-          execute-workflow: receive-command(object request => object status => object status)
-          execute-command: send-command(string interface, string command, map<string, object> arguments => map<string, object> response => map<string, object> response)
-
-    keystore:
-      type: reference.Service
-      interfaces:
-        keypair-store:
-          get-keypair: receive-command(string id => object privateKey)
-
-
     selenium-grid:
-      required: [keystore]
       type: workflow.Instance
       interfaces:
         input:
@@ -55,170 +36,169 @@ application:
           scale: receive-command( int node-count => list<string> node-hosts)
           re-start: receive-command()
 
-        keystore:
-          get-keypair: send-command(string id => object privateKey)
-
       configuration:
         configuration.triggers: 
             input.node-count: scale
 
         configuration.workflows:
-            launch:
-              steps:
-                - provision-hub:
-                    action: selenium-provision
-                    phase: provision-hub
-                    parameters:
-                      node-count: 1
-                      role: hub
-                    output:
-                      selenium-hub: hosts
+          launch:
+            steps:
+              provision-hub:
+                action: selenium-provision
+                phase: provision-hub
+                parameters:
+                  node-count: 1
+                  role: hub
+                output:
+                  selenium-hub: hosts
 
-                - deploy-hub:
-                    action: .deploy 
-                    precedingPhases: [ provision-hub ]
-                    phase: deploy-hub
-                    parameters:
-                      run-list: ["recipe[selenium::grid_hub]"]
-                      role: hub
+              deploy-hub:
+                action: .deploy
+                precedingPhases: [ provision-hub ]
+                phase: deploy-hub
+                parameters:
+                  run-list: ["recipe[selenium::grid_hub]"]
+                  role: hub
 
-                - deploy-node-on-hub:
-                    action: .deploy
-                    precedingPhases: [ provision-hub , deploy-hub ]
-                    parameters:
-                      hub-host: "{$.selenium-hub[0]}"
-                      role: hub
+              deploy-node-on-hub:
+                action: .deploy
+                precedingPhases: [ provision-hub , deploy-hub ]
+                parameters:
+                  hub-host: "{$.selenium-hub[0]}"
+                  role: hub
 
-                - deploy-slave-nodes:
-                    action: .scale
-                    precedingPhases: [ provision-hub ]
-                    parameters:
-                      hub-host: "{$.selenium-hub[0]}"
+              deploy-slave-nodes:
+                action: .scale
+                precedingPhases: [ provision-hub ]
+                parameters:
+                  hub-host: "{$.selenium-hub[0]}"
+                output:
+                  node-hosts: node-hosts
 
-              return:
-                console-url:
-                  description: Url to grid console
-                  value: "http://{$.selenium-hub[0]}:4444/grid/console"
-                remote-url:
-                  description: Url to grid console
-                  value: "http://{$.selenium-hub[0]}:4444/wd/hub"
-                hub-host: 
-                  value: "{$.selenium-hub[0]}"
-                node-hosts:
-                  value: []
+            return:
+              console-url:
+                description: Url to grid console
+                value: "http://{$.selenium-hub[0]}:4444/grid/console"
+              remote-url:
+                description: Url to grid console
+                value: "http://{$.selenium-hub[0]}:4444/wd/hub"
+              hub-host:
+                value: "{$.selenium-hub[0]}"
+              node-hosts:
+                value: "{$.node-hosts}"
 
-            #used for trigger, context is known
-            scale:
-              steps:
-                - scale:
-                    action: .scale
-                    parameters:
-                      hub-host: "{$.hub-host}"
-                    output:
-                      node-hosts: node-hosts
-              return:
-                node-hosts:
-                  value: "{$.node-hosts}"
-            .scale:
-              parameters:
-                - hub-host:
-                    description: hub host
-              steps:
-                - provision-node:
-                    action: selenium-provision
-                    phase: provision-node
-                    parameters:
-                      node-count: "{$.node-count}" #this goes from configuration
-                    output:
-                      node-hosts: hosts
-                - deploy-node:
-                    action: .deploy
-                    precedingPhases: [ provision-node ]
-                    parameters:
-                      hub-host: "{$.hub-host}"
-              return:
-                node-hosts:
-                  value: "{$.node-hosts}"
+          #used for trigger, context is known
+          scale:
+            steps:
+              scale:
+                action: .scale
+                parameters:
+                  hub-host: "{$.hub-host}"
+                output:
+                  node-hosts: node-hosts
+            return:
+              node-hosts:
+                value: "{$.node-hosts}"
+          .scale:
+            parameters:
+              hub-host:
+                description: hub host
+            steps:
+              provision-node:
+                action: selenium-provision
+                phase: provision-node
+                parameters:
+                  node-count: "{$.node-count}" #this goes from configuration
+                output:
+                  node-hosts: hosts
+              deploy-node:
+                action: .deploy
+                precedingPhases: [ provision-node ]
+                parameters:
+                  hub-host: "{$.hub-host}"
+            return:
+              node-hosts:
+                value: "{$.node-hosts}"
 
-            re-start:
-              steps:
-                - restart-hub:
-                    action: .deploy
-                    parameters:
-                      role: hub
-                      run-list: ["recipe[selenium::grid_hub_restart]" ]
+          re-start:
+            steps:
+              restart-hub:
+                action: .deploy
+                parameters:
+                  role: hub
+                  run-list: ["recipe[selenium::grid_hub_restart]" ]
+              restart-hub-node:
+                action: .deploy
+                precedingPhases: [ restart-hub ]
+                parameters:
+                  role: hub
+                  run-list: ["recipe[selenium::grid_node_restart]" ]
+              restart-nodes:
+                action: .deploy
+                parameters:
+                  role: node
+                  run-list: ["recipe[selenium::grid_node_restart]" ]
 
-                - restart-nodes:
-                    action: .deploy
-                    parameters:
-                      role: node
-                      run-list: ["recipe[selenium::grid_node_restart]" ]
+          selenium-provision:
+            parameters:
+              node-count:
+                description: Additional nodes in grid
+                default: 1
+                min: 1
+                max: 20
+              role:
+                description: VM role
+                default: node
+              #these should be overriden from policies
+              vmIdentity:
+                default: ubuntu
+              imageId:
+                default: us-east-1/ami-d0f89fb9
+              hardwareId:
+                default: m1.small
 
-            destroy:
-              steps:
-                - destroy:
-                    action: undeployEnv
+            steps:
+              provision-nodes:
+                action: provisionVms
+                parameters:
+                  roleName: "{$.role}"
+                  targetQuantity: "{$.node-count}"
+                  vmIdentity: "{$.vmIdentity}"
+                  imageId: "{$.imageId}"
+                  hardwareId: "{$.hardwareId}"
+                output:
+                  hosts: ips
+            return:
+              hosts:
+                value: "{$.hosts}"
 
-            selenium-provision:
-              parameters:
-                - node-count:
-                      description: Additional nodes in grid
-                      default: 1
-                      min: 1
-                      max: 20
-                - role:
-                      description: VM role
-                      default: node
-                #these should be overriden from policies
-                - vmIdentity:
-                      default: ubuntu
-                - imageId:
-                      default: us-east-1/ami-d0f89fb9
-                - hardwareId: 
-                      default: m1.small
-
-              steps:
-                - provision-nodes:
-                      action: provisionVms
-                      parameters:
-                        roleName: "{$.role}"
-                        targetQuantity: "{$.node-count}"
-                        vmIdentity: "{$.vmIdentity}"
-                        imageId: "{$.imageId}"
-                        hardwareId: "{$.hardwareId}"
-                      output:
-                        hosts: ips
-              return:
-                hosts:
-                  value: "{$.hosts}"
-
-            .deploy:
-              parameters:
-                - run-list:
-                      description: Run chef cookbooks
-                      default: ["recipe[selenium::firefox]", "recipe[selenium::chrome]", "recipe[selenium::grid_node]"]
-                - role:
-                      description: VM role
-                      default: node
-                - hub-host:
-                      default: 127.0.0.1
-                - selenium-version:
-                      default: "{$.selenium-version}"
-                - recipes:
-                      default: "{$.recipes}"
-              steps:
-                - install-selenium:
-                      action: chefrun
-                      parameters:
-                        roles: ["{$.role}"]
-                        runList: ${run-list}
-                        isSolo: true
-                        recipeUrl: "{$.recipes}"
-                        jattrs:
-                            selenium:
-                                server:
-                                    cleanUpCycle: 20000
-                                    timeout: 120000 
-                                    version: "{$.selenium-version}"
-                                node:
-                                    hubhost: "{$.hub-host}"
+          .deploy:
+            parameters:
+              run-list:
+                description: Run chef cookbooks
+                default: ["recipe[selenium::firefox]", "recipe[selenium::chrome]", "recipe[selenium::grid_node]"]
+              role:
+                description: VM role
+                default: node
+              hub-host:
+                default: 127.0.0.1
+              selenium-version:
+                default: "{$.selenium-version}"
+              recipes:
+                default: "{$.recipes}"
+            steps:
+              install-selenium:
+                action: chefrun
+                parameters:
+                  roles: ["{$.role}"]
+                  runList: ${run-list}
+                  isSolo: true
+                  recipeUrl: "{$.recipes}"
+                  jattrs:
+                    selenium:
+                      server:
+                        cleanUpCycle: 20000
+                        timeout: 120000
+                        version: "{$.selenium-version}"
+                      node:
+                        hubhost: "{$.hub-host}"
