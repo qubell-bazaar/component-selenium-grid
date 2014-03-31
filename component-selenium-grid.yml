@@ -38,7 +38,9 @@ application:
 
       configuration:
         configuration.triggers: 
-            input.node-count: scale
+          input.node-count: scale
+        configuration.propagateStatus:
+          - scale
 
         configuration.workflows:
           launch:
