@@ -9,6 +9,7 @@ export DISPLAY=<%= node['selenium']['xvfb']['display'] %>
 NODEJAVA=/usr/bin/java
 NODEARGS="-jar $SELPATH -role webdriver -hub http://$HUBHOST/grid/register -nodeConfig $CONFIGPATH"
 PIDFILE=/var/run/selenium/node_${DISPLAY:1}.pid
+mkdir -p /var/run/selenium
 case "$1" in
   start)
     echo -n "Starting grid node"

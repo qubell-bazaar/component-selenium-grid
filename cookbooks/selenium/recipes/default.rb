@@ -36,8 +36,17 @@ directory node['selenium']['home']+'init/' do
   recursive true
 end
 
+version = node['selenium']['server']['version']
+version_tuple = version.split('.')
+
+if version_tuple[1].to_i < 39
+  download_path = "http://selenium.googlecode.com/files/selenium-server-standalone-#{version}.jar"
+else
+  download_path = "http://selenium-release.storage.googleapis.com/#{version_tuple[0,2].join('.')}/selenium-server-standalone-#{version}.jar"
+end
+
 remote_file File.join(node['selenium']['server']['installpath'], 'selenium-server-standalone.jar') do
-  source "http://selenium.googlecode.com/files/selenium-server-standalone-#{node['selenium']['server']['version']}.jar"
+  source download_path
   action :create_if_missing
   mode 0644
   owner USER

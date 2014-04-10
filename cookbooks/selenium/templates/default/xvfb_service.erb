@@ -7,6 +7,7 @@ export DISPLAY=$DISPLAY
 XVFB=/usr/bin/Xvfb
 XVFBARGS="$DISPLAY -ac -screen 0 $FBSIZE"
 PIDFILE=/var/run/selenium/xvfb_${DISPLAY:1}.pid
+mkdir -p /var/run/selenium
 case "$1" in
   start)
     echo -n "Starting virtual X frame buffer: Xvfb"
