@@ -14,15 +14,15 @@ class SeleniumGridComponentTestCase(BaseComponentTestCase):
 
     def console_base(self, capability, console, remote):
         driver = None
-	try:
+        try:
             driver = webdriver.Remote(
-                command_executor=remote,
+                command_executor=str(remote),
                 desired_capabilities=capability)
             driver.get(console)
             assert driver.title == "Grid Console"
-	finally:
-	    if driver:
-            	driver.quit()
+        finally:
+            if driver:
+                driver.quit()
 
 
     @instance(byApplication=name)
