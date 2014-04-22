@@ -8,4 +8,6 @@ kit:
     name: "Qubell"
     link: http://qubell.com
   documentation:
-    overview: ""
+    overview: |
+      This application requires the following items to be configured in your environment:
+        * Amazon EC2 or Rackspace CloudServers account;
