@@ -3,7 +3,7 @@ kit:
   link: https://github.com/qubell-bazaar/component-selenium-grid
   applications: 
     - name: "Selenium Grid"
-      manifest: "https://raw.github.com/qubell-bazaar/component-selenium-grid/master/selenium-grid-manifest.yml"
+      manifest: "https://raw.github.com/qubell-bazaar/component-selenium-grid/master/component-selenium-grid.yml"
   provider:
     name: "Qubell"
     link: http://qubell.com
