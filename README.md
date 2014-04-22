@@ -1,6 +1,8 @@
 ![Qubell](http://qubell.wpengine.com/wp-content/uploads/2013/05/Qubell-Logo-RGB-Sml.png) Selenium Grid 
 =============
 
+[![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/master/_resources/meta.yml)
+
 [![Build Status](https://travis-ci.org/qubell-bazaar/component-selenium-grid.png?branch=master)](https://travis-ci.org/qubell-bazaar/component-selenium-grid)
 
 This is qubell component, that allows to create selenium-grid in few clicks.
