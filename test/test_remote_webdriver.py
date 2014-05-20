@@ -1,4 +1,5 @@
 import os
+import time
 
 from test_runner import BaseComponentTestCase
 from qubell.api.private.testing import instance, workflow, values
@@ -13,6 +14,7 @@ class SeleniumGridComponentTestCase(BaseComponentTestCase):
     }]
 
     def console_base(self, capability, console, remote):
+        time.sleep(15)  # let node establish connection with hub
         driver = None
         try:
             driver = webdriver.Remote(
