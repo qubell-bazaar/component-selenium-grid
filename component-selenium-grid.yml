@@ -2,7 +2,7 @@ application:
   configuration:
     conf.selenium-version: "2.41.0"
     conf.slave-node-count: "0"
-    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-877c13e.tar.gz"
+    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/loky9000/component-selenium-grid-cookbooks-stable-877c13d.tar.gz"
 
   interfaces:
     conf: 
@@ -18,6 +18,7 @@ application:
     actions:
       scale: bind(selenium-grid#actions.scale)
       re-start: bind(selenium-grid#actions.re-start)
+      change-version: bind(selenium-grid#actions.change-version)
 
   components:
     selenium-grid:
@@ -35,12 +36,13 @@ application:
         actions:
           scale: receive-command( int node-count => list<string> node-hosts)
           re-start: receive-command()
+          change-version: receive-command( string selenium-version )
 
       configuration:
         configuration.triggers: 
           input.node-count: scale
-        configuration.propagateStatus:
-          - scale
+          input.selenium-version: change-version
+        configuration.propagateStatus: [ scale, change-version ]
 
         configuration.workflows:
           launch:
@@ -174,6 +176,31 @@ application:
               hosts:
                 value: "{$.hosts}"
 
+          change-version:
+            parameters:
+              selenium-version:
+               default: "{$.selenium-version}"
+              hub-host:
+               default: "{$.hub-host}"
+            steps:
+              get-env-props:
+                action: getEnvironmentProperties
+                phase: get-env-props
+                output:
+                  props: result
+              update-version:
+                action: .deploy
+                phase: update-version
+                precedingPhases: [ get-env-props ]
+                parameters:
+                  run-list: ["recipe[selenium::update_version]"]
+                  hub-host: "{$.hub-host}"
+                  role: hub
+              restart:
+                action: re-start
+                phase: restart
+                precedingPhases: [ update-version ]
+   
           .deploy:
             parameters:
               run-list:
