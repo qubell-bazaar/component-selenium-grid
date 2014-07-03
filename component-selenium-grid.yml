@@ -177,11 +177,6 @@ application:
                 value: "{$.hosts}"
 
           change-version:
-            parameters:
-              selenium-version:
-               default: "{$.selenium-version}"
-              hub-host:
-               default: "{$.hub-host}"
             steps:
               get-env-props:
                 action: getEnvironmentProperties
