@@ -188,7 +188,7 @@ application:
                 phase: get-env-props
                 output:
                   props: result
-              update-version:
+              update-version-hub:
                 action: .deploy
                 phase: update-version
                 precedingPhases: [ get-env-props ]
@@ -196,10 +196,18 @@ application:
                   run-list: ["recipe[selenium::update_version]"]
                   hub-host: "{$.hub-host}"
                   role: hub
+              update-version-node:
+                action: .deploy
+                phase: update-version-node
+                precedingPhases: [ get-env-props ]
+                parameters:
+                  run-list: ["recipe[selenium::update_version]"]
+                  hub-host: "{$.hub-host}"
+                  role: node
               restart:
                 action: re-start
                 phase: restart
-                precedingPhases: [ update-version ]
+                precedingPhases: [ update-version, update-version-node ]
    
           .deploy:
             parameters:
