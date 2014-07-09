@@ -3,8 +3,6 @@
 
 [![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/master/_resources/meta.yml)
 
-[![Build Status](http://jenkins.dev.qubell.com:8080/buildStatus/icon?job=component-selenium-grid-upstream)](http://jenkins.dev.qubell.com:8080/view/Bazaar-Components/view/component-selenium-grid/job/component-selenium-grid-upstream/)
-
 This is qubell component, that allows to create selenium-grid in few clicks.
 
 Reasoning
