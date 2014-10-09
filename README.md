@@ -14,30 +14,28 @@ With Selenium Grid, you no longer need to rely on your local browser(s) for test
 
 Requirements
 ------------
-You must have an AWS account capable of creating EC2 nodes. Configure the EC2 "default" security group to allow connections on the following ports:
+You must have an AWS cloud account capable of creating EC2 nodes. Configure the EC2 "default" security group to allow connections on the following ports:
 - 22 (SSH)
 - 4444 (Selenium Hub)
 
 Quick Start
 -----------
-**IMPORTANT:** To use Selenium Grid with the Qubell platform, you need an AWS account that is capable of creating EC2 nodes. Refer to *Requirements* above.
+**IMPORTANT:** To use Selenium Grid with the Qubell platform, you need an AWS cloud account that is capable of creating EC2 nodes. Refer to *Requirements* above.
 
 1. Install Selenium Grid by clicking  [![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/master/_resources/meta.yml).
 
 2. Follow the on-screen instructions to add Selenium Grid to your organization within the Qubell Platform.
 
-3. Confirm that you have *Workflow Service* and *Secure Vault 2.0* running for your environment 
-(`Environments` >`{Your Platform}`>`Services`). If you do not, you can add services by clicking the `Add a service...` 
-button.
+3. If you do not have an AWS cloud account, create one now and configure it per the *Requirements* stated above.
 
-4. Confirm that you have a *Cloud Account* running for your environment (`Components` >`Cloud Account`). If you do not, you can add a cloud account by clicking the `[+] Add Component` button.
+4. Confirm that *Cloud Account*, *Workflow Service* and *Secure Vault 2.0* are running as services for your environment (`Environments` >`{Your Platform}`>`Services`). To add these services, click the `Add a service...` button.
 
-4. Navigate to `Components` and launch `Selenium Grid` (by clicking the play button).
+5. Navigate to `Components` and launch `Selenium Grid` (by clicking the play button).
 
-5. If successful, you should see a remote URL and console URL set similar to those shown below.
+6. If successful, you should see a remote URL and console URL set similar to those shown below.
 ![Running Grid Component](_resources/GridComponent.png)
 
-6. Click the console URL. You should see a screen similar to that shown below.
+7. Click the console URL. You should see a screen similar to that shown below.
 ![Selenium Grid Console](_resources/GridConsole.png)
 
 Testing Your Installation
@@ -50,24 +48,24 @@ and launch `python`.
 >>> from selenium import webdriver
 >>> from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
->>> """Type in remote URL and driver"""
->>> remoteUrl = 'Use the remote URL from your grid instance'
->>> driver = webdriver.Remote
-(command_executor=remoteUrl,desired_capabilities=DesiredCapabilities.CHROME)
-```
-Open your console URL. You should see that one of the Chrome icons is shaded, which indicates that it's
-your allocated browser in the cloud.
+>>> remoteUrl = 'Use remote-url from grid instance here'
+>>> driver = webdriver.Remote(
+   command_executor=remoteUrl,
+   desired_capabilities=DesiredCapabilities.CHROME)
 
-Next, use `driver.get` to navigate to a page given by the URL and `driver.Title` to returns the title of 
-the page.
+>>> """Now open console-url"""
+>>> """You should see that one Chrome icon is shaded"""
+>>> """This is your allocated browser in the cloud"""
 
-``` python
+>>> """Let's check out what it can do"""
 >>> driver.get("http://qubell.com")
 >>> driver.title
+u'Qubell - Adaptive Enterprise Platform-as-a-Service (PaaS)'
+
+>>> "Congratulations, you're ready to use Selenium Grid"
 ```
 
-The result should be **"Qubell: Innovate Faster! Deliver daily upgrades safely & routinely"** (or something similar). Note 
-that this test should take no more than 5 minutes to complete. If it exceeds 5 minutes, please contact [support@qubell.com](support@qubell.com).
+Note that this test should take no more than 5 minutes to complete. If it exceeds 5 minutes, please contact [support@qubell.com](support@qubell.com).
 
 About
 --------------
@@ -78,19 +76,17 @@ Advanced Configuration
 ----------------------
 The following advanced configuration options are available for Selenium Grid:
 
-1. On start, you may define:
+1. On start, you may reconfigure:
  - The Cookbooks URI
- - A newer version of Selenium
- - The initial slave count (i.e. number of nodes)
+ - ``selenium version`` (2.0 and newer)
+ - ``node count``
 
 2. Under Environment Policies, you may override:
  - `selenium-provision.vmIdentity`
  - `selenium-provision.imageId`
  - `selenium-provision.hardwareId`
   
-3. During runtime, you may configure the number of nodes via the `scale` command.
-
-4. You may utilize the `restart` command to manually restart Selenium Grid.
+3. You may utilize the `restart` command to manually restart Selenium Grid.
 
 FAQ
 ---
