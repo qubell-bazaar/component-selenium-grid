@@ -1,8 +1,7 @@
 import os
 import time
 
-from test_runner import BaseComponentTestCase
-from qubell.api.private.testing import instance, workflow, values
+from qubell.api.testing import *
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
