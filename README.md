@@ -1,6 +1,6 @@
 ![Qubell](http://qubell.wpengine.com/wp-content/uploads/2013/05/Qubell-Logo-RGB-Sml.png) Selenium Grid 
 =============
-Version 1.1-33p
+Version 1.2-35p
 ---------------
 Qubell Selenium Grid is an on-demand component for AWS that has been designed specifically for distributed cloud environments. It is:
 
@@ -12,7 +12,7 @@ With Selenium Grid, you no longer need to rely on your local browser(s) for test
 
 **To install Qubell Selenium Grid, just click the button below.**
 
-[![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/1.1-33p/meta.yml)
+[![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/1.2-35p/meta.yml)
 
 Requirements
 ------------
@@ -24,7 +24,7 @@ Quick Start
 -----------
 **IMPORTANT:** To use Selenium Grid with the Qubell platform, you need an AWS cloud account that is capable of creating EC2 nodes. Refer to *Requirements* above.
 
-1. Install Selenium Grid by clicking  [![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/1.1-33p/meta.yml).
+1. Install Selenium Grid by clicking  [![Install](https://raw.github.com/qubell-bazaar/component-skeleton/master/img/install.png)](https://express.qubell.com/applications/upload?metadataUrl=https://raw.github.com/qubell-bazaar/component-selenium-grid/1.2-35p/meta.yml).
 
 2. Follow the on-screen instructions to add Selenium Grid to your organization within the Qubell Platform.
 

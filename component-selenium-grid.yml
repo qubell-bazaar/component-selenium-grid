@@ -2,7 +2,7 @@ application:
   configuration:
     conf.selenium-version: "2.44.0"
     conf.slave-node-count: "0"
-    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-1807358.tar.gz"
+    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-073a2ff.tar.gz"
 
   interfaces:
     conf: 
