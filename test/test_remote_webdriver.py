@@ -1,16 +1,35 @@
 import os
 import time
 
-from qubell.api.testing import *
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+from qubell.api.testing import *
+
+
+@environment({
+    "chef_11": {
+        "policies": [{
+                         "action": "chefrun",
+                         "parameter": "version",
+                         "value": "11.18.6"
+                     }]
+    },
+    "chef_12": {
+        "policies": [{
+                         "action": "chefrun",
+                         "parameter": "version",
+                         "value": "12.2.1"
+                     }]
+    }
+
+})
 class SeleniumGridComponentTestCase(BaseComponentTestCase):
     name = "component-selenium-grid"
     apps = [{
-        "name": name,
-        "file": os.path.realpath(os.path.join(os.path.dirname(__file__), '../%s.yml' % name))
-    }]
+                "name": name,
+                "file": os.path.realpath(os.path.join(os.path.dirname(__file__), '../%s.yml' % name))
+            }]
 
     def console_base(self, capability, console, remote):
         time.sleep(15)  # let node establish connection with hub
@@ -29,7 +48,12 @@ class SeleniumGridComponentTestCase(BaseComponentTestCase):
     @instance(byApplication=name)
     @values({"endpoints.console-url": "console", "endpoints.remote-url": "remote"})
     def test_chrome(self, instance, console, remote):
-        self.console_base(DesiredCapabilities.CHROME, console, remote)
+        capabilities = webdriver.ChromeOptions().to_capabilities()
+        # https://sites.google.com/a/chromium.org/chromedriver/help/chrome-doesn-t-start
+        # Passing '--no-sandbox' flag when creating your WebDriver session.
+        # Special test environments sometimes cause Chrome to crash when the sandbox is enabled.
+        capabilities['chromeOptions']['args'].append('--no-sandbox')
+        self.console_base(capabilities, console, remote)
 
     @instance(byApplication=name)
     @values({"endpoints.console-url": "console", "endpoints.remote-url": "remote"})

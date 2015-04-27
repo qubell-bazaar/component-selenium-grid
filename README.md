@@ -1,5 +1,5 @@
-![Qubell](http://qubell.wpengine.com/wp-content/uploads/2013/05/Qubell-Logo-RGB-Sml.png) Selenium Grid 
-=============
+Qubell Selenium Grid
+====================
 Version 1.2-35p
 ---------------
 Qubell Selenium Grid is an on-demand component for AWS that has been designed specifically for distributed cloud environments. It is:
@@ -53,7 +53,7 @@ and launch `python`.
 >>> remoteUrl = 'Use remote-url from grid instance here'
 >>> driver = webdriver.Remote(
    command_executor=remoteUrl,
-   desired_capabilities=DesiredCapabilities.CHROME)
+   desired_capabilities=DesiredCapabilities.FIREFOX)
 
 >>> """Now open console-url"""
 >>> """You should see that one Chrome icon is shaded"""
@@ -95,6 +95,10 @@ FAQ
 Q: What are Selenium and Grid?
  - A: Check out http://www.seleniumhq.org/projects/webdriver and https://code.google.com/p/selenium/wiki/Grid2 for more
  information.
+
+Q: ChromeDriver crashes unexpectedly
+ - A: We've recently removed `chromium` with `google-chrome`, in headless mode it requires minor changes.
+ Ensure you have '--no-sandbox' in Chrome arguments. Please refer to https://sites.google.com/a/chromium.org/chromedriver/help/chrome-doesn-t-start
 
 Q: The example is in Python. Do you support other languages as well?
  - A: Selenium is a cross-platform tool, so other languages are supported. Please refer to 

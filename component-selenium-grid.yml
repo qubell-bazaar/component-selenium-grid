@@ -1,6 +1,6 @@
 application:
   configuration:
-    conf.selenium-version: "2.44.0"
+    conf.selenium-version: "2.45.0"
     conf.slave-node-count: "0"
     conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-073a2ff.tar.gz"
 
@@ -25,18 +25,38 @@ application:
       type: workflow.Instance
       interfaces:
         input:
-          selenium-version: configuration(string)
-          node-count: configuration(string)
-          recipes: configuration(string)
+          selenium-version:
+            type: configuration(string)
+            name: Selenium Version
+          node-count:
+            type: configuration(string)
+            name: Count of Additional Nodes
+          recipes:
+            type: configuration(string)
+            name: Recipes Url
         result:
-          console-url: publish-signal(string)
-          remote-url: publish-signal(string)
-          hub-host: publish-signal(string)
-          node-hosts: publish-signal(list<string>)
+          console-url:
+            type: publish-signal(string)
+            name: Console
+          remote-url:
+            type: publish-signal(string)
+            name: Remote Url
+          hub-host:
+            type: publish-signal(string)
+            name: Hub
+          node-hosts:
+            type: publish-signal(list<string>)
+            name: Nodes
         actions:
-          scale: receive-command( int node-count => list<string> node-hosts)
-          re-start: receive-command()
-          change-version: receive-command( string selenium-version )
+          re-start:
+            type: receive-command()
+            name: Restart Hosts
+          scale:
+            type: receive-command( int node-count => list<string> node-hosts)
+            name: scale (deprecated, use reconfigure)
+          change-version:
+            type: receive-command( string selenium-version )
+            name: change version (deprecated, use reconfigure)
 
       configuration:
         configuration.triggers: 
