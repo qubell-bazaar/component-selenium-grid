@@ -7,28 +7,23 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from qubell.api.testing import *
 
 
+# noinspection PyShadowingNames,PyUnusedLocal
 @environment({
-    "chef_11": {
-        "policies": [{
-                         "action": "chefrun",
-                         "parameter": "version",
-                         "value": "11.18.6"
-                     }]
-    },
+    "chef_11": {},  # default
     "chef_12": {
         "policies": [{
-                         "action": "chefrun",
-                         "parameter": "version",
-                         "value": "12.2.1"
-                     }]
+                    "action": "chefrun",
+                    "parameter": "version",
+                    "value": "12.2.1"
+        }]
     }
 
 })
 class SeleniumGridComponentTestCase(BaseComponentTestCase):
     name = "component-selenium-grid"
     apps = [{
-                "name": name,
-                "file": os.path.realpath(os.path.join(os.path.dirname(__file__), '../%s.yml' % name))
+            "name": name,
+            "file": os.path.realpath(os.path.join(os.path.dirname(__file__), '../%s.yml' % name))
             }]
 
     def console_base(self, capability, console, remote):
@@ -43,7 +38,6 @@ class SeleniumGridComponentTestCase(BaseComponentTestCase):
         finally:
             if driver:
                 driver.quit()
-
 
     @instance(byApplication=name)
     @values({"endpoints.console-url": "console", "endpoints.remote-url": "remote"})

@@ -244,6 +244,7 @@ application:
                 parameters:
                   roles: ["{$.role}"]
                   runList: ${run-list}
+                  version: 11.18.6
                   isSolo: true
                   recipeUrl: "{$.recipes}"
                   jattrs:
