@@ -1,104 +1,264 @@
 application:
   configuration:
-    conf.selenium-version: "2.45.0"
-    conf.slave-node-count: "0"
-    conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-9292b20.tar.gz"
-
+    input.hub-image: { ami: "us-east-1/ami-96a818fe", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-hub" }
+    input.linux-nodes-image: { ami: "us-east-1/ami-96a818fe", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-linux-node" }
+    input.linux-nodes-quantity: 0
+    input.windows-nodes-image: { ami: "us-east-1/ami-31620c54", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-windows-node"}
+    input.windows-nodes-quantity: 0
+    input.windows-user-password: "qwerty12!"
+    input.selenium-version: "2.47.0"
+    input.ie-driver-version: "2.47.0"
+    input.chrome-driver-version: "2.16"
+    #conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-9292b20.tar.gz"
+    input.recipes: "https://dl.dropboxusercontent.com/u/250836/selenium.tar.gz"
+    input.java-win-url: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/deps/jdk-7u71-windows-x64.exe"
+    input.mirror: "http://adp-repo.s3-website-us-east-1.amazonaws.com/cygwin"
+    input.packages: "openssh,curl,util-linux,procps,wget,unzip"
   interfaces:
-    conf: 
-      selenium-version: bind(selenium-grid#input.selenium-version)
-      slave-node-count: bind(selenium-grid#input.node-count)
-      recipes: bind(selenium-grid#input.recipes)
+    input:
+      hub-image: bind(selenium-hub#input.hub-image)
+      selenium-version: bind(selenium-hub#input.selenium-version, linux-nodes.selenium-linux-node#input.selenium-version, windows-nodes.selenium-windows-node#input.selenium-version)
+      ie-driver-version: bind(selenium-hub#input.ie-driver-version, linux-nodes.selenium-linux-node#input.ie-driver-version, windows-nodes.selenium-windows-node#input.ie-driver-version)
+      chrome-driver-version: bind(selenium-hub#input.chrome-driver-version, linux-nodes.selenium-linux-node#input.chrome-driver-version, windows-nodes.selenium-windows-node#input.chrome-driver-version)
+      windows-user-password: bind(selenium-hub#input.windows-user-password, windows-nodes.selenium-windows-node#input.windows-user-password)
+      linux-nodes-image: bind(linux-nodes.selenium-linux-node#input.linux-nodes-image)
+      linux-nodes-quantity: bind(proxy#input.linux-nodes-quantity)
+      windows-nodes-image: bind(windows-nodes.selenium-windows-node#input.windows-nodes-image)
+      windows-nodes-quantity: bind(proxy#input.windows-nodes-quantity)
+      recipes: bind(selenium-hub#input.recipes, linux-nodes.selenium-linux-node#input.recipes, windows-nodes.selenium-windows-node#input.recipes)
+      java-win-url: bind(selenium-hub#input.java-win-url, windows-nodes.selenium-windows-node#input.java-win-url)
+      mirror: bind(selenium-hub#input.mirror, windows-nodes.selenium-windows-node#input.mirror)
+      packages: bind(selenium-hub#input.packages, windows-nodes.selenium-windows-node#input.packages)
+    app-meta:
+      application-pic: "bind(metadata#output.application-pic)"
     endpoints:
-     console-url: bind(selenium-grid#result.console-url)
-     remote-url: bind(selenium-grid#result.remote-url)
+     console-url: bind(selenium-hub#result.console-url)
+     remote-url: bind(selenium-hub#result.remote-url)
     hosts:
-      hub: bind(selenium-grid#result.hub-host)
-      nodes: bind(selenium-grid#result.node-hosts)
-    actions:
-      scale: bind(selenium-grid#actions.scale)
-      re-start: bind(selenium-grid#actions.re-start)
-      change-version: bind(selenium-grid#actions.change-version)
-
+      hub: bind(selenium-hub#result.hub-host)
+      #nodes: bind(selenium-grid#result.node-hosts)
+  bindings:
+    - [linux-nodes.selenium-linux-node, selenium-hub]
+    - [windows-nodes.selenium-windows-node, selenium-hub]
+    - [proxy#linux-nodes, linux-nodes]
+    - [proxy#windows-nodes, windows-nodes]
   components:
-    selenium-grid:
+    metadata:
+      type: cobalt.common.Constants
+      interfaces:
+        output:
+          application-pic:
+            type: publish-signal(map<string, object>)
+            name: ""
+      configuration:
+        configuration.values:
+          output.application-pic:
+            large: "https://s3.amazonaws.com/qubell-images/selenium-logo.png"
+            small: "https://s3.amazonaws.com/qubell-images/selenium-logo-small.png"
+            small-height: 64
+    selenium-hub:
       type: workflow.Instance
       interfaces:
         input:
-          selenium-version:
-            type: configuration(string)
-            name: Selenium Version
-          node-count:
-            type: configuration(string)
-            name: Count of Additional Nodes
-          recipes:
-            type: configuration(string)
-            name: Recipes Url
+          hub-image:
+            type: configuration(map<string, object>)
+            suggestions:
+              "Win2008r2 (us-east-1)": { ami: "us-east-1/ami-31620c54", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-hub"  }
+              "Win2008r2 (us-west-1)": { ami: "us-west-1/ami-2b2dd76f", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-hub"  }
+              "CentOS 7.1 (us-east-1)": { ami: "us-east-1/ami-96a818fe", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-hub" }
+              "CentOS 7.1 (us-west-1)": { ami: "us-west-1/ami-6bcfc42e", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-hub" }
+          selenium-version: { type: configuration(string), name: Selenium Version }
+          ie-driver-version: { type: configuration(string), name: IE Driver Version }
+          chrome-driver-version: { type: configuration(string), name: Chrome Driver Version }
+          recipes: { type: configuration(string), name: Recipes Url }
+          java-win-url: { type: configuration(string), name: "Windows Java installer URL" }
+          windows-user-password: { type: configuration(string), name: "Windows Administrator user password" }
+          mirror: { type: configuration(string), name: "Cygwin installation binary URL" }
+          packages: { type: configuration(string), name: "Cygwin pacakages to install" }
         result:
-          console-url:
-            type: publish-signal(string)
-            name: Console
-          remote-url:
-            type: publish-signal(string)
-            name: Remote Url
-          hub-host:
-            type: publish-signal(string)
-            name: Hub
-          node-hosts:
-            type: publish-signal(list<string>)
-            name: Nodes
-        actions:
-          re-start:
-            type: receive-command()
-            name: Restart Hosts
-          scale:
-            type: receive-command( int node-count => list<string> node-hosts)
-            name: scale (deprecated, use reconfigure)
-          change-version:
-            type: receive-command( string selenium-version )
-            name: change version (deprecated, use reconfigure)
+          console-url: { type: publish-signal(string), name: Console }
+          remote-url: { type: publish-signal(string), name: Remote Url }
+          hub-host: { type: publish-signal(string), name: Hub }
+          hub-private-ip: { type: publish-signal(string), name: Hub private IP }
+          hub-private-ips: { type: publish-signal(list<string>), name: Hub private IPs }
 
       configuration:
-        configuration.triggers: 
-          input.node-count: scale
-          input.selenium-version: change-version
-        configuration.propagateStatus: [ scale, change-version ]
-
+        configuration.triggers:
+          input.selenium-version: update
+          input.ie-driver-version: update
+          input.chrome-driver-version: update
+        configuration.propagateStatus: [ update ]
         configuration.workflows:
-          launch:
+          launch: &change-version
             steps:
-              provision-hub:
-                action: selenium-provision
-                phase: provision-hub
-                parameters:
-                  node-count: 1
-                  role: hub
-                output:
-                  selenium-hub: hosts
+              - launch-vm:
+                  action: provisionVms
+                  parameters:
+                    hardwareId: "{$.hub-image.hw}"
+                    imageId: "{$.hub-image.ami}"
+                    vmIdentity: "{$.hub-image.user}"
+                    jcloudsNodeNamePrefix: "{$.hub-image.prefix}"
+                    targetQuantity: 1
+                    roleName: "{$.hub-image.type}"
+                    connectTimeout: 20 minutes
+                    providerSettings:
+                      userData: &userdata
+                        |
+                          <powershell>
+                              If (Test-Path "C:\cygwin64\bin\bash.exe") {{
+                                    C:\cygwin64\bin\bash.exe --login -c "mkgroup -l > /etc/group"
+                                    C:\cygwin64\bin\bash.exe --login -c "mkpasswd -l > /etc/passwd"
+                              }} Else {{
 
-              deploy-hub:
-                action: .deploy
-                precedingPhases: [ provision-hub ]
-                phase: deploy-hub
-                parameters:
-                  run-list: ["recipe[selenium::grid_hub]"]
-                  role: hub
+                                    (New-Object System.Net.WebClient).DownloadFile("http://cygwin.com/setup-x86_64.exe", "setup-x86_64.exe")
 
-              deploy-node-on-hub:
-                action: .deploy
-                precedingPhases: [ provision-hub , deploy-hub ]
-                parameters:
-                  hub-host: "{$.selenium-hub[0]}"
-                  role: hub
+                                    .\setup-x86_64.exe --no-desktop --site '{$.mirror}' --quiet-mode --local-package-dir C:\cygwin64\local_packages --packages '{$.packages}' | Out-Null
 
-              deploy-slave-nodes:
-                action: .scale
-                precedingPhases: [ provision-hub ]
-                parameters:
-                  hub-host: "{$.selenium-hub[0]}"
-                output:
-                  node-hosts: node-hosts
+                                    C:\cygwin64\bin\bash.exe --login -c "cp /usr/bin/ps.exe /usr/bin/ps.exe~; cp /bin/ps.exe /bin/ps.exe~; cp /usr/bin/procps.exe /usr/bin/ps.exe; cp /usr/bin/procps.exe /bin/ps.exe"
 
+                                    # nearly 13.12.14 ssh-host-config bug was introduced in cygwin
+                                    # 1. root and Administrators groups are duplicated in /etc/group after installation
+                                    # 2. first ssh-host-config run fails because created cyg_server missing in /etc/passwd
+                                    # 3. sshd windows service has wrong user because of #2
+                                    Add-Type -Assembly System.Web
+                                    $$cyg_server_password_length = 15
+                                    $$cyg_server_password_non_alphanum = 5
+                                    $$cyg_server_password = [System.Web.Security.Membership]::GeneratePassword($$cyg_server_password_length, $$cyg_server_password_non_alphanum)
+                                    C:\cygwin64\bin\bash.exe --login -c "mkgroup > /etc/group"
+                                    C:\cygwin64\bin\bash.exe --login -c "ssh-host-config --yes --user cyg_server --pwd '$$cyg_server_password'"
+                                    C:\cygwin64\bin\bash.exe --login -c "mkpasswd > /etc/passwd"
+                                    C:\cygwin64\bin\bash.exe --login -c "cygrunsrv -R sshd"
+                                    C:\cygwin64\bin\bash.exe --login -c "ssh-host-config --yes --user cyg_server --pwd '$$cyg_server_password'"
+
+                                    # sshd 6.7 is too restrictive, reverting to 6.6 defaults
+                                    C:\cygwin64\bin\bash.exe --login -c "echo Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,aes192-cbc,aes256-cbc,arcfour >> /etc/sshd_config"
+                                    C:\cygwin64\bin\bash.exe --login -c "echo MACs hmac-md5,hmac-sha1,hmac-ripemd160,hmac-sha1-96,hmac-md5-96 >> /etc/sshd_config"
+                                    C:\cygwin64\bin\bash.exe --login -c "echo KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1,diffie-hellman-group-exchange-sha1 >> /etc/sshd_config"
+
+                                    netsh advfirewall firewall add rule name="CYGWIN sshd" dir=in action=allow program="C:\cygwin64\usr\sbin\sshd.exe" enable=yes
+                              }}
+                              C:\cygwin64\bin\bash.exe --login -c "mkdir -p ~/.undeploy.me"
+
+                              echo @'
+                              param(
+                              [string]$$chef_build = "10"  # 10.32.2-3 and 11.16.4-1 currently supported
+                              )
+                              # detect platform default and use ours
+                              if ($$chef_build -eq "10" -or $$chef_build -eq "10.16.2") {{
+                                  $$chef_build = "10.32.2-3"
+                              }} elseif ($$chef_build -eq "11") {{
+                                  $$chef_build = "11.16.4-1"
+                              }}
+                              If ((Test-Path "C:/opscode/chef/bin/chef-solo") -or ($$chefVersion -eq "")) {{
+                                  Write-Host "Chef already installed or chef build not specified, skipping installation..."
+                              }} Else {{
+                                  cd C:\
+                                  $$chef_version = $$chef_build.Split("-")[0]
+                                  $$chef_major_version = $$chef_build.Split(".")[0]
+                                  C:\cygwin64\bin\curl.exe -O "https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/x86_64/chef-windows-$${{chef_build}}.windows.msi"
+                                  Start-Process -FilePath msiexec -ArgumentList /i, "C:\chef-windows-$${{chef_build}}.windows.msi", /quiet, /qn -Wait
+                                  # supply chef original tar
+                                  C:/cygwin64/bin/sed -i "s|tar zxvf|C:/opscode/chef/bin/tar zxvf|"  C:/opscode/chef/embedded/lib/ruby/gems/1.9.1/gems/chef-$${{chef_version}}-x86-mingw32/lib/chef/application/solo.rb
+                                  if ($$chef_major_version -eq "11") {{
+                                      # fix chef bug
+                                      C:/cygwin64/bin/sed -i "s/status.exitstatus/0/g"                   C:/opscode/chef/embedded/lib/ruby/gems/1.9.1/gems/chef-$${{chef_version}}-x86-mingw32/lib/chef/mixin/command.rb
+                                  }}
+                                  C:\cygwin64\bin\bash.exe --login -c "mkdir ~/bin"
+                                  C:\cygwin64\bin\bash.exe --login -c "cat > ~/bin/shef <<'EEND'
+                          #!/usr/bin/bash --login
+                          /cygdrive/c/opscode/chef/embedded/bin/ruby.exe C:/opscode/chef/bin/shef `$$*
+                          EEND
+                          chmod +x ~/bin/shef
+                          "
+                                  C:\cygwin64\bin\bash.exe --login -c "cat > ~/bin/chef-client <<'EEND'
+                          #!/usr/bin/bash --login
+                          /cygdrive/c/opscode/chef/embedded/bin/ruby.exe C:/opscode/chef/bin/chef-client `$$*
+                          EEND
+                          chmod +x ~/bin/chef-client
+                          "
+                                  C:\cygwin64\bin\bash.exe --login -c "cat > ~/bin/chef-solo <<'EEND'
+                          #!/usr/bin/bash --login
+                          CONFIG_PATH=
+                          OTHER_ARGS=
+                          while [ \`"x`$$1\`" != x ]; do
+                              if [ \`"`$$1\`" == -c ]; then
+                                  shift;
+                                  CONFIG_PATH=\`"`$$1\`"
+                                  shift;
+                              else
+                                  OTHER_ARGS=\`"`$$OTHER_ARGS `$$1\`"
+                                  shift;
+                              fi
+                          done
+                          FILE_CACHE=`$$(grep file_cache_path `$$CONFIG_PATH | awk '{{print `$$2}}' | sed -re 's/\x22(.*)\x22/\1/')
+                          COOKBOOKS=`$$(grep cookbook_path `$$CONFIG_PATH | awk '{{print `$$2}}' | sed -re 's/.*\x22(.*)\x22.*/\1/')
+                          QUBELL_COOKBOOKS=`$$(grep cookbook_path `$$CONFIG_PATH | awk '{{print `$$3}}' | sed -re 's/.*\x22(.*)\x22.*/\1/')
+                          ROLES=`$$(grep role_path `$$CONFIG_PATH | awk '{{print `$$2}}' | sed -re 's/.*\x22(.*)\x22.*/\1/')
+                          DATA_BAGS=`$$(grep data_bag_path `$$CONFIG_PATH | awk '{{print `$$2}}' | sed -re 's/.*\x22(.*)\x22.*/\1/')
+                          NODE_PATH=`$$(grep node_path `$$CONFIG_PATH | awk '{{print `$$2}}' | sed -re 's/.*\x22(.*)\x22.*/\1/')
+                          NODE_NAME=`$$(grep node_name `$$CONFIG_PATH | awk '{{print `$$2}}' | sed -re 's/.*\x22(.*)\x22.*/\1/')
+                          NEW_ROOT=`$$(mktemp -d)
+                          # platform homedir detection behaves wrong in some cases, so we should detect and fix it
+                          if echo `$$NODE_PATH | grep -E '^.?\.undeploy.me' >/dev/null 2>/dev/null; then
+                              ROOT_FIX=`$$(cygpath -m `$$HOME)/
+                              OLD_ROOT=`$$ROOT_FIX
+                          else
+                              ROOT_FIX=''
+                              OLD_ROOT=`$$FILE_CACHE
+                          fi
+                          pushd `$$OLD_ROOT
+                          icacls . /save access.txt
+                          icacls `$$(cygpath -m `$$NEW_ROOT) /restore access.txt
+                          popd
+                          cp -r `$$ROOT_FIX`$$COOKBOOKS `$$NEW_ROOT/cookbooks 2>/dev/null
+                          cp -r `$$ROOT_FIX`$$QUBELL_COOKBOOKS `$$NEW_ROOT/qubell_cookbooks 2>/dev/null
+                          cp -r `$$ROOT_FIX`$$DATA_BAGS `$$NEW_ROOT/data_bags 2>/dev/null
+                          cp -r `$$ROOT_FIX`$$ROLES `$$NEW_ROOT/roles 2>/dev/null
+                          cd ~
+                          NODE_PATH_FIX=`$$(echo `$$NODE_PATH | cut -c 2-)
+                          mkdir -p `$$NODE_PATH_FIX
+                          chmod 0755 `$$NODE_PATH_FIX
+                          chmod 0755 `$$NODE_PATH_FIX/`$$NODE_NAME.json
+                          chmod 0755 `$$ROOT_FIX`$$NODE_PATH_FIX
+                          chmod 0755 `$$ROOT_FIX`$$NODE_PATH_FIX/`$$NODE_NAME.json
+                          cat `$$CONFIG_PATH | sed -re \`"s|`$$COOKBOOKS|`$$(cygpath -m `$$NEW_ROOT/cookbooks)|;s|`$$QUBELL_COOKBOOKS|`$$(cygpath -m `$$NEW_ROOT/qubell_cookbooks)|;s|`$$DATA_BAGS|`$$(cygpath -m `$$NEW_ROOT/data_bags)|;s|`$$ROLES|`$$(cygpath -m `$$NEW_ROOT/roles)|;s|`$$NODE_PATH|`$$ROOT_FIX`$$NODE_PATH_FIX|;s|\x22`$$FILE_CACHE\x22|\x22`$$(cygpath -m `$$NEW_ROOT)\x22|;\`" > `$$NEW_ROOT/client.rb
+
+                          /cygdrive/c/opscode/chef/embedded/bin/ruby.exe C:/opscode/chef/bin/chef-solo -c `$$(cygpath -m `$$NEW_ROOT/client.rb) `$$OTHER_ARGS
+                          EEND
+                          chmod +x ~/bin/chef-solo
+                          "
+                                  C:\cygwin64\bin\bash.exe --login -c "cat > ~/.bashrc <<'EEND'
+                          export LC_ALL=C
+                          export LANG=C
+                          export PATH=~/bin:`$$PATH
+                          EEND
+                          "
+                              }}
+                          '@ | Out-File $$(C:\cygwin64\bin\bash.exe --login -c "cygpath -w ~/.undeploy.me/chef-install.ps1")
+                              C:\cygwin64\bin\bash.exe --login -c "mkdir -p ~/.ssh"
+                              $$drive = (Get-Volume -FileSystemLabel config-2 | % {{ $$_.DriveLetter }})
+                              If (Test-Path "$${{drive}}:\openstack\") {{
+                                  C:\cygwin64\bin\bash.exe --login -c "grep ssh-rsa `$$(find `$$(find /cygdrive -maxdepth 2 -name openstack -or -name ec2) -name 'meta?data.json') | sed -re 's/.*(ssh-rsa [a-zA-Z0-9+/=]+).*/\1/' | uniq >> ~/.ssh/authorized_keys"
+                              }} Else {{
+                                  C:\cygwin64\bin\bash.exe --login -c "curl --connect-timeout 5 169.254.169.254/latest/meta-data/public-keys/0/openssh-key > ~/.ssh/authorized_keys"
+                              }}
+                              C:\cygwin64\bin\bash.exe --login -c "chmod 0700 ~/.ssh; chmod 0600 ~/.ssh/authorized_keys"
+                              net start sshd
+                          </powershell>
+                  output:
+                    selenium-hub: ips
+                    hub-private-ips: privateips
+              - change-admin-password:
+                  action: execrun
+                  precedingPhases: [launch-vm]
+                  parameters:
+                    roles: [ windows ]
+                    isSudo: false
+                    command:
+                      - "NET USER ADMINISTRATOR {$.windows-user-password}"
+              - install-hub:
+                  action: update
+                  precedingPhases: [change-admin-password]
             return:
               console-url:
                 description: Url to grid console
@@ -107,151 +267,273 @@ application:
                 description: Url to grid console
                 value: "http://{$.selenium-hub[0]}:4444/wd/hub"
               hub-host:
+                description: Selenium Hub host
                 value: "{$.selenium-hub[0]}"
-              node-hosts:
-                value: "{$.node-hosts}"
+              hub-private-ip:
+                description: Selenium Hub private ip
+                value: "{$.hub-private-ips[0]}"
+              hub-private-ips:
+                description: Selenium Hub private ip list
+                value: "{$.hub-private-ips}"
 
-          #used for trigger, context is known
-          scale:
+          update:
             steps:
-              scale:
-                action: .scale
-                parameters:
-                  hub-host: "{$.hub-host}"
-                output:
-                  node-hosts: node-hosts
-            return:
-              node-hosts:
-                value: "{$.node-hosts}"
-          .scale:
-            parameters:
-              hub-host:
-                description: hub host
-            steps:
-              provision-node:
-                action: selenium-provision
-                phase: provision-node
-                parameters:
-                  node-count: "{$.node-count}" #this goes from configuration
-                output:
-                  node-hosts: hosts
-              deploy-node:
-                action: .deploy
-                precedingPhases: [ provision-node ]
-                parameters:
-                  hub-host: "{$.hub-host}"
-            return:
-              node-hosts:
-                value: "{$.node-hosts}"
+              - setup-hub:
+                  action: chefsolo
+                  parameters:
+                    retryCount: 3
+                    version: "11.16.4-1"
+                    isSudo: "{$.hub-image.issudo}"
+                    recipeUrl: "{$.recipes}"
+                    runList: [ "recipe[cookbook-qubell-selenium::grid_hub]" ]
+                    roles: ["{$.hub-image.type}"]
+                    jattrs:
+                      java:
+                        jdk_version: "7"
+                        windows:
+                          url: "{$.java-win-url}"
+                          package_name: "Java SE Development Kit 7 Update 71 (64-bit)"
+                      selenium:
+                        server_version: "{$.selenium-version}"
+                        hub:
+                          host: "{$.hub-private-ips[0]}"
+              - setup-node:
+                  action: chefsolo
+                  precedingPhases: [setup-hub]
+                  parameters:
+                    retryCount: 3
+                    version: "11.16.4-1"
+                    isSudo: "{$.hub-image.issudo}"
+                    recipeUrl: "{$.recipes}"
+                    runList: [ "recipe[cookbook-qubell-selenium::grid_node]" ]
+                    roles: ["{$.hub-image.type}"]
+                    jattrs:
+                      java:
+                        jdk_version: "7"
+                        windows:
+                          url: "{$.java-win-url}"
+                          package_name: "Java SE Development Kit 7 Update 71 (64-bit)"
+                      selenium:
+                        server_version: "{$.selenium-version}"
+                        iedriver_version: "{$.ie-driver-version}"
+                        chromedriver_version: "{$.chrome-driver-version}"
+                        node:
+                          hubHost: "{$.hub-private-ips[0]}"
 
-          re-start:
+    proxy:
+      type: workflow.Instance
+      interfaces:
+        input:
+          linux-nodes-quantity: { type: configuration(int), name: Linux nodes quantity }
+          windows-nodes-quantity: { type: configuration(int), name: Windows nodes quantity }
+        linux-nodes:
+          set-quantity: send-command(int quantity)
+        windows-nodes:
+          set-quantity: send-command(int quantity)
+      required: [ linux-nodes, windows-nodes ]
+      configuration:
+        configuration.propagateStatus: [ scale ]
+        configuration.triggers:
+          input.linux-nodes-quantity: scale
+          input.windows-nodes-quantity: scale
+        configuration.workflows:
+          launch: &scale-wf
             steps:
-              restart-hub:
-                action: .deploy
-                parameters:
-                  role: hub
-                  run-list: ["recipe[selenium::grid_hub_restart]" ]
-              restart-hub-node:
-                action: .deploy
-                precedingPhases: [ restart-hub ]
-                parameters:
-                  role: hub
-                  run-list: ["recipe[selenium::grid_node_restart]" ]
-              restart-nodes:
-                action: .deploy
-                parameters:
-                  role: node
-                  run-list: ["recipe[selenium::grid_node_restart]" ]
+              - init-linux-nodes:
+                  action: commandCall
+                  parameters:
+                    service: linux-nodes
+                    command: set-quantity
+                    arguments:
+                      quantity: "{$.linux-nodes-quantity}"
+                    timeout: 30 minutes
+              - init-windows-nodes:
+                  action: commandCall
+                  parameters:
+                    service: windows-nodes
+                    command: set-quantity
+                    arguments:
+                      quantity: "{$.windows-nodes-quantity}"
+                    timeout: 30 minutes
+          scale: *scale-wf
+    linux-nodes:
+      type: composite.Scaler
+      configuration:
+        configuration.minQuantity: 0
+      components:
+        selenium-linux-node:
+          type: workflow.Instance
+          interfaces:
+            input:
+              linux-nodes-image:
+                type: configuration(map<string, object>)
+                suggestions:
+                  "CentOS 7.1 (us-east-1)": { ami: "us-east-1/ami-96a818fe", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-linux-node" }
+                  "CentOS 7.1 (us-west-1)": { ami: "us-west-1/ami-6bcfc42e", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-linux-node" }
+              recipes: { type: configuration(string), name: Recipes Url }
+              selenium-version: { type: configuration(string), name: Selenium Version }
+              ie-driver-version: { type: configuration(string), name: IE Driver Version }
+              chrome-driver-version: { type: configuration(string), name: Chrome Driver Version }
+            selenium-hub:
+              hub-host: { type: consume-signal(string), name: Hub }
+              hub-private-ip: { type: consume-signal(string), name: Hub private IP }
+            result:
+              selenium-linux-nodes: { type: publish-signal(list<string>), name: Selenium Linux nodes }
+          required: [selenium-hub]
+          configuration:
+            configuration.triggers:
+              input.selenium-version: update
+              input.ie-driver-version: update
+              input.chrome-driver-version: update
+            configuration.propagateStatus: [ update ]
+            configuration.workflows:
+              launch:
+                steps:
+                  - get-env-props:
+                      action: getEnvironmentProperties
+                      output:
+                        props: result
+                  - launch-vm:
+                      action: provisionVms
+                      precedingPhases: [get-env-props]
+                      parameters:
+                        hardwareId: "{$.linux-nodes-image.hw}"
+                        imageId: "{$.linux-nodes-image.ami}"
+                        vmIdentity: "{$.linux-nodes-image.user}"
+                        jcloudsNodeNamePrefix: "{$.linux-nodes-image.prefix}"
+                        targetQuantity: 1
+                        roleName: "{$.linux-nodes-image.type}"
+                      output:
+                        linux-node-hosts: ips
+                  - instal-linux-node:
+                      action: update
+                      precedingPhases: [launch-vm]
+                      
+                return:
+                  selenium-linux-nodes:
+                    value: "{$.linux-node-hosts}"
 
-          selenium-provision:
-            parameters:
-              node-count:
-                description: Additional nodes in grid
-                default: 1
-                min: 1
-                max: 20
-              role:
-                description: VM role
-                default: node
-              #these should be overriden from policies
-              vmIdentity:
-                default: ubuntu
-              imageId:
-                default: us-east-1/ami-d0f89fb9
-              hardwareId:
-                default: m1.small
+              update:
+                steps:
+                  - get-env-props:
+                      action: getEnvironmentProperties
+                      output:
+                        props: result
+                  - setup-node:
+                      action: chefsolo
+                      precedingPhases: [get-env-props]
+                      parameters:
+                        retryCount: 3
+                        version: "11.16.4-1"
+                        isSudo: "{$.linux-nodes-image.issudo}"
+                        recipeUrl: "{$.recipes}"
+                        runList: [ "recipe[cookbook-qubell-selenium::grid_node]" ]
+                        roles: ["{$.linux-nodes-image.type}"]
+                        jattrs:
+                          java:
+                            jdk_version: "7"
+                          selenium:
+                            server_version: "{$.selenium-version}"
+                            chromedriver_version: "{$.chrome-driver-version}"
+                            node:
+                              hubHost: "{$.props.selenium-hub.hub-private-ip}"
 
-            steps:
-              provision-nodes:
-                action: provisionVms
-                parameters:
-                  roleName: "{$.role}"
-                  targetQuantity: "{$.node-count}"
-                  vmIdentity: "{$.vmIdentity}"
-                  imageId: "{$.imageId}"
-                  hardwareId: "{$.hardwareId}"
-                output:
-                  hosts: ips
-            return:
-              hosts:
-                value: "{$.hosts}"
-
-          change-version:
-            steps:
-              get-env-props:
-                action: getEnvironmentProperties
-                phase: get-env-props
-                output:
-                  props: result
-              update-version-hub:
-                action: .deploy
-                phase: update-version
-                precedingPhases: [ get-env-props ]
-                parameters:
-                  run-list: ["recipe[selenium::update_version]"]
-                  hub-host: "{$.hub-host}"
-                  role: hub
-              update-version-node:
-                action: .deploy
-                phase: update-version-node
-                precedingPhases: [ get-env-props ]
-                parameters:
-                  run-list: ["recipe[selenium::update_version]"]
-                  hub-host: "{$.hub-host}"
-                  role: node
-              restart:
-                action: re-start
-                phase: restart
-                precedingPhases: [ update-version, update-version-node ]
-   
-          .deploy:
-            parameters:
-              run-list:
-                description: Run chef cookbooks
-                default: ["recipe[selenium::firefox]", "recipe[selenium::chrome]", "recipe[selenium::grid_node]"]
-              role:
-                description: VM role
-                default: node
-              hub-host:
-                default: 127.0.0.1
-              selenium-version:
-                default: "{$.selenium-version}"
-              recipes:
-                default: "{$.recipes}"
-            steps:
-              install-selenium:
-                action: chefrun
-                parameters:
-                  roles: ["{$.role}"]
-                  runList: ${run-list}
-                  version: 11.18.6
-                  isSolo: true
-                  recipeUrl: "{$.recipes}"
-                  jattrs:
-                    selenium:
-                      server:
-                        cleanUpCycle: 20000
-                        timeout: 120000
-                        version: "{$.selenium-version}"
-                      node:
-                        hubhost: "{$.hub-host}"
+    windows-nodes:
+      type: composite.Scaler
+      configuration:
+        configuration.minQuantity: 0
+      components:
+        selenium-windows-node:
+          type: workflow.Instance
+          interfaces:
+            input:
+              windows-nodes-image:
+                type: configuration(map<string, object>)
+                suggestions:
+                  "Win2008r2 (us-east-1)": { ami: "us-east-1/ami-31620c54", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-windows-node"  }
+                  "Win2008r2 (us-west-1)": { ami: "us-west-1/ami-2b2dd76f", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-windows-node"  }
+              selenium-version: { type: configuration(string),  name: Selenium Version }
+              ie-driver-version: { type: configuration(string), name: IE Driver Version }
+              chrome-driver-version: { type: configuration(string), name: Chrome Driver Version }
+              recipes: {  type: configuration(string),  name: Recipes Url }
+              java-win-url: { type: configuration(string), name: "Windows Java installer URL" }
+              windows-user-password: { type: configuration(string), name: "Windows Administrator user password" }
+              mirror: { type: configuration(string), name: "Cygwin installation binary URL" }
+              packages: { type: configuration(string), name: "Cygwin pacakages to install" }
+            selenium-hub:
+              hub-host: { type: consume-signal(string), name: Hub }
+              hub-private-ip: { type: consume-signal(string), name: Hub private IP }
+            result:
+              selenium-windows-nodes: { type: publish-signal(list<string>), name: Selenium Linux nodes }
+          required: [selenium-hub]
+          configuration:
+            configuration.triggers:
+              input.selenium-version: update
+              input.ie-driver-version: update
+              input.chrome-driver-version: update
+            configuration.propagateStatus: [ update ]
+            configuration.workflows:
+              launch:
+                steps:
+                  - get-env-props:
+                      action: getEnvironmentProperties
+                      output:
+                        props: result
+                  - launch-vm:
+                      action: provisionVms
+                      precedingPhases: [get-env-props]
+                      parameters:
+                        hardwareId: "{$.windows-nodes-image.hw}"
+                        imageId: "{$.windows-nodes-image.ami}"
+                        vmIdentity: "{$.windows-nodes-image.user}"
+                        jcloudsNodeNamePrefix: "{$.windows-nodes-image.prefix}"
+                        targetQuantity: 1
+                        roleName: "{$.windows-nodes-image.type}"
+                        connectTimeout: 20 minutes
+                        providerSettings:
+                          userData: *userdata
+                      output:
+                        windows-node-hosts: ips
+                  - change-admin-password:
+                      action: execrun
+                      precedingPhases: [launch-vm]
+                      parameters:
+                        roles: [ windows ]
+                        isSudo: false
+                        command:
+                          - "NET USER ADMINISTRATOR {$.windows-user-password}"
+                  - install-windows-node:
+                      action: update
+                      precedingPhases: [change-admin-password]                      
+                return:
+                  selenium-windows-nodes:
+                    value: "{$.windows-node-hosts}"
+              
+              update:
+                steps:
+                  - get-env-props:
+                      action: getEnvironmentProperties
+                      output:
+                        props: result
+                  - setup-windows-node:
+                      action: chefsolo
+                      precedingPhases: [get-env-props]
+                      parameters:
+                        retryCount: 3
+                        version: "11.16.4-1"
+                        isSudo: "{$.windows-nodes-image.issudo}"
+                        recipeUrl: "{$.recipes}"
+                        runList: [ "recipe[cookbook-qubell-selenium::grid_node]" ]
+                        roles: ["{$.windows-nodes-image.type}"]
+                        jattrs:
+                          java:
+                            jdk_version: "7"
+                            windows:
+                              url: "{$.java-win-url}"
+                              package_name: "Java SE Development Kit 7 Update 71 (64-bit)"
+                          selenium:
+                            server_version: "{$.selenium-version}"
+                            iedriver_version: "{$.ie-driver-version}"
+                            chromedriver_version: "{$.chrome-driver-version}"
+                            node:
+                              hubHost: "{$.props.selenium-hub.hub-private-ip}"
