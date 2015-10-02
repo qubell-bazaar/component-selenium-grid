@@ -9,8 +9,7 @@ application:
     input.selenium-version: "2.47.0"
     input.ie-driver-version: "2.47.0"
     input.chrome-driver-version: "2.16"
-    #conf.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-9292b20.tar.gz"
-    input.recipes: "https://dl.dropboxusercontent.com/u/250836/selenium.tar.gz"
+    input.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-9292b20.tar.gz"
     input.java-win-url: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/deps/jdk-7u71-windows-x64.exe"
     input.mirror: "http://adp-repo.s3-website-us-east-1.amazonaws.com/cygwin"
     input.packages: "openssh,curl,util-linux,procps,wget,unzip"
@@ -36,7 +35,6 @@ application:
      remote-url: bind(selenium-hub#result.remote-url)
     hosts:
       hub: bind(selenium-hub#result.hub-host)
-      #nodes: bind(selenium-grid#result.node-hosts)
   bindings:
     - [linux-nodes.selenium-linux-node, selenium-hub]
     - [windows-nodes.selenium-windows-node, selenium-hub]
@@ -62,6 +60,7 @@ application:
         input:
           hub-image:
             type: configuration(map<string, object>)
+            name: "Selenium Hub image"
             suggestions:
               "Win2008r2 (us-east-1)": { ami: "us-east-1/ami-31620c54", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-hub"  }
               "Win2008r2 (us-west-1)": { ami: "us-west-1/ami-2b2dd76f", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-hub"  }
@@ -367,6 +366,7 @@ application:
             input:
               linux-nodes-image:
                 type: configuration(map<string, object>)
+                name: "Selenium Node linux image"
                 suggestions:
                   "CentOS 7.1 (us-east-1)": { ami: "us-east-1/ami-96a818fe", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-linux-node" }
                   "CentOS 7.1 (us-west-1)": { ami: "us-west-1/ami-6bcfc42e", user: "centos", type: "linux", hw: "m3.medium", issudo: true, prefix: "Selenium-linux-node" }
@@ -449,6 +449,7 @@ application:
             input:
               windows-nodes-image:
                 type: configuration(map<string, object>)
+                name: "Selenium Node windows image"
                 suggestions:
                   "Win2008r2 (us-east-1)": { ami: "us-east-1/ami-31620c54", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-windows-node"  }
                   "Win2008r2 (us-west-1)": { ami: "us-west-1/ami-2b2dd76f", user: "Administrator", type: "windows", hw: "m3.large", issudo: false, prefix: "Selenium-windows-node"  }
