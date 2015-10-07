@@ -9,7 +9,7 @@ application:
     input.selenium-version: "2.47.0"
     input.ie-driver-version: "2.47.0"
     input.chrome-driver-version: "2.16"
-    input.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-9292b20.tar.gz"
+    input.recipes: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/qubell-bazaar/component-selenium-grid-cookbooks-stable-53098c9.tar.gz"
     input.java-win-url: "https://s3.amazonaws.com/qubell-starter-kit-artifacts/deps/jdk-7u71-windows-x64.exe"
     input.cygwin-url: "http://adp-repo.s3-website-us-east-1.amazonaws.com/cygwin"
     input.packages: "openssh,curl,util-linux,procps,wget,unzip"
